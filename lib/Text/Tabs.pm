@@ -1,93 +1,45 @@
 package Text::Tabs;
 
-require Exporter;
-
-@ISA = (Exporter);
-@EXPORT = qw(expand unexpand $tabstop);
-
-use vars qw($VERSION $SUBVERSION $tabstop $debug);
-$VERSION = 2013.0910;
-$SUBVERSION = 'old';
-
 use strict;
+use warnings;
 
-BEGIN	{
-	$tabstop = 8;
-	$debug = 0;
+my $flavour;
+our @ISA;
+
+BEGIN {
+    my @to_alias = qw(
+        &expand &unexpand
+        $VERSION $SUBVERSION $tabstop $debug
+    );
+
+    require Exporter;
+    @ISA = qw(Exporter);
+
+    my $base = __PACKAGE__;
+
+    $flavour = ($] >= 5.010) ? "${base}::Modern" : "${base}::Old";
+
+    # Aliasing ensures that fully-qualified usage works...
+    my $alias_code = "use $flavour;\n";
+    foreach my $what (@to_alias) {
+        my ($sigil, $name) = $what =~ /^(.)(.+)$/;
+        $sigil = '*' if $sigil eq '$'; # required to allow 'local' to work on aliased package variables
+
+        # Example:      *Text::Foo::bar   = \&Text::Foo::Modern::bar;
+        $alias_code .= "*${base}::${name} = \\${sigil}${flavour}::${name};\n";
+    }
+
+    eval $alias_code;
 }
 
-sub expand {
-	my @l;
-	my $pad;
-	for ( @_ ) {
-		my $s = '';
-		for (split(/^/m, $_, -1)) {
-			my $offs = 0;
-			s{\t}{
-				$pad = $tabstop - (pos() + $offs) % $tabstop;
-				$offs += $pad - 1;
-				" " x $pad;
-			}eg;
-			$s .= $_;
-		}
-		push(@l, $s);
-	}
-	return @l if wantarray;
-	return $l[0];
-}
-
-sub unexpand
-{
-	my (@l) = @_;
-	my @e;
-	my $x;
-	my $line;
-	my @lines;
-	my $lastbit;
-	my $ts_as_space = " " x $tabstop;
-	for $x (@l) {
-		@lines = split("\n", $x, -1);
-		for $line (@lines) {
-			$line = expand($line);
-			@e = split(/(.{$tabstop})/,$line,-1);
-			$lastbit = pop(@e);
-			$lastbit = '' 
-				unless defined $lastbit;
-			$lastbit = "\t"
-				if $lastbit eq $ts_as_space;
-			for $_ (@e) {
-				if ($debug) {
-					my $x = $_;
-					$x =~ s/\t/^I\t/gs;
-					print "sub on '$x'\n";
-				}
-				s/  +$/\t/;
-			}
-			$line = join('',@e, $lastbit);
-		}
-		$x = join("\n", @lines);
-	}
-	return @l if wantarray;
-	return $l[0];
+sub import {
+    # ...and this ensures that import requests are handled by the correct flavour
+    $flavour->export_to_level(1, @_);
+    return;
 }
 
 1;
 __END__
-
-sub expand
-{
-	my (@l) = @_;
-	for $_ (@l) {
-		1 while s/(^|\n)([^\t\n]*)(\t+)/
-			$1. $2 . (" " x 
-				($tabstop * length($3)
-				- (length($2) % $tabstop)))
-			/sex;
-	}
-	return @l if wantarray;
-	return $l[0];
-}
-
 
 =head1 NAME
 
@@ -108,6 +60,9 @@ do.  Given a line with tabs in it, C<expand> replaces those tabs with
 the appropriate number of spaces.  Given a line with or without tabs in
 it, C<unexpand> adds tabs when it can save bytes by doing so, 
 like the C<unexpand -a> command.  
+
+See L<Text::Tabs::Modern/UNICODE> for details of Unicode handling when
+using this module with perl version 5.10 or later.
 
 =head1 EXPORTS
 
@@ -140,11 +95,11 @@ C<local($Text::Tabs::tabstop)>.
     print unexpand $_;
   }
 
-Instead of the C<expand> command, use:
+Instead of the shell's C<expand> command, use:
 
   perl -MText::Tabs -n -e 'print expand $_'
 
-Instead of the C<unexpand -a> command, use:
+Instead of the shell's C<unexpand -a> command, use:
 
   perl -MText::Tabs -n -e 'print unexpand $_'
 
@@ -152,12 +107,14 @@ Instead of the C<unexpand -a> command, use:
 
 This module comes in two flavors: one for modern perls (5.10 and above)
 and one for ancient obsolete perls.  The version for modern perls has
-support for Unicode.  The version for old perls does not.  You can tell
-which version you have installed by looking at C<$Text::Tabs::SUBVERSION>:
-it is C<old> for obsolete perls and C<modern> for current perls.
+support for Unicode.  The version for old perls does not.
 
-This man page is for the version for obsolete perls and so that's probably
-what you've got.
+You can tell which version you have installed by looking at
+C<$Text::Tabs::SUBVERSION>: it is C<old> for obsolete perls and
+C<modern> for current perls.
+
+Documentation specific to a subversion can be found in
+L<Text::Tabs::Modern> and L<Text::Tabs::Old>.
 
 =head1 LICENSE
 

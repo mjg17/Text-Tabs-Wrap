@@ -1,8 +1,10 @@
 CHANGELOG
-lib.modern/Text/Tabs.pm
-lib.modern/Text/Wrap.pm
-lib.old/Text/Tabs.pm
-lib.old/Text/Wrap.pm
+lib/Text/Tabs.pm
+lib/Text/Tabs/Modern.pm
+lib/Text/Tabs/Old.pm
+lib/Text/Wrap.pm
+lib/Text/Wrap/Modern.pm
+lib/Text/Wrap/Old.pm
 Makefile.PL
 MANIFEST
 META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-package Text::Tabs;
+package Text::Tabs::Modern;
 
 require Exporter;
 
@@ -101,79 +101,18 @@ sub expand
 
 =head1 NAME
 
-Text::Tabs - expand and unexpand tabs like unix expand(1) and unexpand(1)
+Text::Tabs::Modern - implementation of Text::Tabs for perls from
+version 5.10 onwards.
 
-=head1 SYNOPSIS
+See L<Text::Tabs> for full documentation.
 
-  use Text::Tabs;
-
-  $tabstop = 4;  # default = 8
-  @lines_without_tabs = expand(@lines_with_tabs);
-  @lines_with_tabs = unexpand(@lines_without_tabs);
-
-=head1 DESCRIPTION
-
-Text::Tabs does most of what the unix utilities expand(1) and unexpand(1) 
-do.  Given a line with tabs in it, C<expand> replaces those tabs with
-the appropriate number of spaces.  Given a line with or without tabs in
-it, C<unexpand> adds tabs when it can save bytes by doing so, 
-like the C<unexpand -a> command.  
+=head1 UNICODE
 
 Unlike the old unix utilities, this module correctly accounts for
 any Unicode combining characters (such as diacriticals) that may occur
 in each line for both expansion and unexpansion.  These are overstrike
 characters that do not increment the logical position.  Make sure
 you have the appropriate Unicode settings enabled.
-
-=head1 EXPORTS
-
-The following are exported:
-
-=over 4
-
-=item expand
-
-=item unexpand
-
-=item $tabstop
-
-The C<$tabstop> variable controls how many column positions apart each
-tabstop is.  The default is 8.
-
-Please note that C<local($tabstop)> doesn't do the right thing and if you want
-to use C<local> to override C<$tabstop>, you need to use
-C<local($Text::Tabs::tabstop)>.
-
-=back
-
-=head1 EXAMPLE
-
-  #!perl
-  # unexpand -a
-  use Text::Tabs;
-
-  while (<>) {
-    print unexpand $_;
-  }
-
-Instead of the shell's C<expand> command, use:
-
-  perl -MText::Tabs -n -e 'print expand $_'
-
-Instead of the shell's C<unexpand -a> command, use:
-
-  perl -MText::Tabs -n -e 'print unexpand $_'
-
-=head1 SUBVERSION
-
-This module comes in two flavors: one for modern perls (5.10 and above)
-and one for ancient obsolete perls.  The version for modern perls has
-support for Unicode.  The version for old perls does not.  You can tell
-which version you have installed by looking at C<$Text::Tabs::SUBVERSION>:
-it is C<old> for obsolete perls and C<modern> for current perls.
-
-This man page is for the version for modern perls and so that's probably
-what you've got.
 
 =head1 BUGS
 
