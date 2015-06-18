@@ -1,3 +1,11 @@
+= 2015/06/18
+
+Install both old and modern versions; use magic to load the correct one.
+
+    Instead of choosing what to install at build time, install
+    everything. At runtime, load the correct sub-module, and
+    use aliasing and Exporter::export_to_level() to connect it.
+
 = 2013/09/10
 
 Fix module 'NAME'
