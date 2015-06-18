@@ -204,6 +204,7 @@ many many others.
 
 Copyright (C) 1996-2009 David Muir Sharnoff.  
 Copyright (C) 2012-2013 Google, Inc.
+Copyright (C) 2015 Michael Gray
 This module may be modified, used, copied, and redistributed at your own risk.
 Although allowed by the preceding license, please do not publicly
 redistribute modified versions of this code with the name "Text::Wrap"
